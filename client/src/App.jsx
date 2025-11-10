@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
 import ReactJson from "@microlink/react-json-view";
+import "highlight.js/styles/github.css";
+import { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from "rehype-raw";
-import "highlight.js/styles/github.css";
 
 // Helper function to resolve nested path like 'data.user.tasks'
 function resolvePath(obj, path) {
@@ -106,6 +106,12 @@ function App() {
         const parsed = JSON.parse(content);
         setJsonData(parsed);
         setError("");
+
+        // Clear URL query parameter when uploading a file
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.delete('url');
+        window.history.pushState({}, '', newUrl);
+        setUrl(''); // Also clear the URL input
       } catch (err) {
         setError(`Invalid JSON format: ${err.message}`);
         setJsonData(null);
@@ -161,6 +167,11 @@ function App() {
       const data = await response.json();
       setJsonData(data);
       setError("");
+
+      // Update browser URL with the fetched URL
+      const newUrl = new URL(window.location);
+      newUrl.searchParams.set('url', url);
+      window.history.pushState({}, '', newUrl);
     } catch (err) {
       if (err.name === "SyntaxError") {
         setError(`Invalid JSON format: ${err.message}`);
@@ -179,6 +190,28 @@ function App() {
       setLoading(false);
     }
   };
+
+  // Check for URL query parameter on mount and auto-fetch
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlParam = params.get('url');
+
+    if (urlParam) {
+      setUrl(urlParam);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount
+
+  // Auto-fetch when URL is set from query parameter
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlParam = params.get('url');
+
+    if (urlParam && url === urlParam && !jsonData && !loading) {
+      handleUrlFetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url]); // Run when URL changes
 
   // Get table data from JSON using useMemo to avoid infinite re-renders
   const tableResult = useMemo(() => {
