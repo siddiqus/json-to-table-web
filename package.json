@@ -13,5 +13,8 @@
     "build:server": "yarn workspace server build",
     "build:all": "yarn workspace json-table-viewer build && yarn workspace server build",
     "preview": "yarn workspace json-table-viewer preview"
+  },
+  "dependencies": {
+    "cors": "^2.8.5"
   }
 }
