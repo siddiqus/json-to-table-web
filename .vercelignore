@@ -10,14 +10,6 @@ README.md
 # Development server (not needed in production)
 server/dev-server.js
 
-# Source files (only built files needed)
-client/src
-client/public
-client/index.html
-client/vite.config.ts
-client/tsconfig.json
-client/tsconfig.node.json
-
 # Test files
 **/*.test.js
 **/*.test.ts
