@@ -284,9 +284,14 @@ function App() {
             </div>
           </div>
         </div>
+      </div>
 
-        {jsonData && (
+      {jsonData && (
+        <div className="input-section">
           <div className="path-section">
+            <label className="path-label">
+              Data Path (Optional) - Use dot notation to access the array object property
+            </label>
             <div className="path-header">
               <input
                 type="text"
@@ -295,9 +300,30 @@ function App() {
                   setDataPath(e.target.value);
                   setError("");
                 }}
-                placeholder="Data Path (Optional) - e.g., data.user.tasks"
+                placeholder="e.g. data.results"
                 className="path-input"
               />
+              {jsonData &&
+                typeof jsonData === "object" &&
+                !Array.isArray(jsonData) && (
+                  <div className="path-header-suggestions">
+                    <small className="suggestions-label">
+                      Array Property Suggestions:
+                    </small>
+                    <div className="property-buttons">
+                      {Object.keys(jsonData).map((key) => (
+                        <button
+                          key={key}
+                          onClick={() => setDataPath(key)}
+                          className="property-button"
+                          title={`Click to set path to "${key}"`}
+                        >
+                          {key}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               <button
                 onClick={() => setShowJsonModal(true)}
                 className="inspect-json-button"
@@ -305,31 +331,9 @@ function App() {
                 Inspect JSON
               </button>
             </div>
-            <small>Use dot notation to access nested arrays</small>
-            {jsonData &&
-              typeof jsonData === "object" &&
-              !Array.isArray(jsonData) && (
-                <div className="path-suggestions">
-                  <small className="suggestions-label">
-                    Available properties:
-                  </small>
-                  <div className="property-buttons">
-                    {Object.keys(jsonData).map((key) => (
-                      <button
-                        key={key}
-                        onClick={() => setDataPath(key)}
-                        className="property-button"
-                        title={`Click to set path to "${key}"`}
-                      >
-                        {key}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {(error || tableError) && (
         <div className="error-message">{error || tableError}</div>

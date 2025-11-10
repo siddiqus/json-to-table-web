@@ -32,16 +32,15 @@ h2 {
 
 .input-section {
   background: white;
-  padding: 25px;
-  border-radius: 8px;
+  padding: 15px;
+  border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .main-input-row {
   display: flex;
   gap: 15px;
-  margin-bottom: 15px;
 }
 
 .upload-section {
@@ -53,23 +52,55 @@ h2 {
 }
 
 .path-section {
-  margin-bottom: 25px;
+  margin-bottom: 0;
 }
 
-.path-section:last-child {
-  margin-bottom: 0;
+.path-label {
+  display: block;
+  color: #4a5568;
+  font-size: 0.7rem;
+  margin-bottom: 8px;
+  font-weight: 500;
 }
 
 .path-header {
   display: flex;
   gap: 10px;
   align-items: center;
-  margin-bottom: 10px;
 }
 
 .path-header .path-input {
-  flex: 1;
+  flex: 0 0 25%;
   margin-bottom: 0;
+}
+
+.path-header-suggestions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  padding: 10px 12px;
+  background-color: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  margin: 0 10px;
+}
+
+.path-header-suggestions .suggestions-label {
+  color: #4a5568;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.path-header-suggestions .property-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .inspect-json-button {
@@ -196,11 +227,8 @@ h2 {
 }
 
 .path-suggestions {
-  margin-top: 8px;
-  padding: 10px 12px;
-  background-color: #f7fafc;
-  border-left: 3px solid #4299e1;
-  border-radius: 4px;
+  /* Moved to path-header for inline layout */
+  display: none;
 }
 
 .path-suggestions .suggestions-label {
@@ -217,21 +245,24 @@ h2 {
 }
 
 .property-button {
-  padding: 4px 10px;
+  padding: 3px 8px;
   background-color: white;
   color: #2d3748;
   border: 1px solid #cbd5e0;
-  border-radius: 4px;
+  border-radius: 3px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   transition: all 0.2s ease;
+  line-height: 1.2;
 }
 
 .property-button:hover {
   background-color: #4299e1;
   color: white;
   border-color: #4299e1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
 }
 
 .search-section {
@@ -259,14 +290,14 @@ h2 {
   padding: 15px;
   border-radius: 4px;
   border-left: 4px solid #fc8181;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   font-size: 0.95rem;
 }
 
 .json-table-data-container {
   background: white;
-  padding: 20px;
-  border-radius: 8px;
+  padding: 15px;
+  border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -281,6 +312,8 @@ h2 {
   background-color: #f7fafc;
   position: sticky;
   top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .data-table th {
@@ -600,4 +633,7 @@ h2 {
 .data-table-container {
   overflow-x: auto;
   width: 100%;
+  max-height: 600px;
+  overflow-y: auto;
+  position: relative;
 }
