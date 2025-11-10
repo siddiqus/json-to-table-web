@@ -3,7 +3,7 @@ import ReactJson from "@microlink/react-json-view";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from "rehype-raw";
-import "highlight.js/styles/github-dark.css";
+import "highlight.js/styles/github.css";
 
 // Helper function to resolve nested path like 'data.user.tasks'
 function resolvePath(obj, path) {
@@ -32,6 +32,20 @@ function formatCellContent(value) {
 
 // Component to render table cell with markdown support
 function TableCell({ value }) {
+  // Check if value is a JSON object/array
+  if (typeof value === "object" && value !== null) {
+    const jsonString = JSON.stringify(value, null, 2);
+    return (
+      <div className="markdown-cell">
+        <ReactMarkdown
+          rehypePlugins={[rehypeHighlight, rehypeRaw]}
+        >
+          {`\`\`\`json\n${jsonString}\n\`\`\``}
+        </ReactMarkdown>
+      </div>
+    );
+  }
+
   const content = formatCellContent(value);
 
   // Check if content looks like markdown or HTML
