@@ -1,5 +1,5 @@
 {
-  "buildCommand": "yarn run build:all",
+  "buildCommand": "yarn build",
   "outputDirectory": "client/dist",
   "installCommand": "yarn install",
   "devCommand": "yarn dev",
