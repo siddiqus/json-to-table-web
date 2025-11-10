@@ -3,12 +3,6 @@
   "outputDirectory": "client/dist",
   "installCommand": "yarn install",
   "devCommand": "yarn dev",
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
-    }
-  ],
   "headers": [
     {
       "source": "/api/(.*)",

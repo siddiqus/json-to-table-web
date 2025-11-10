@@ -7,8 +7,8 @@ node_modules
 .env.test.local
 README.md
 
-# Development server (not needed in production)
-server/dev-server.js
+# Server directory (dev server only - api/ is used for production)
+server/
 
 # Test files
 **/*.test.js
