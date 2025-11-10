@@ -20,7 +20,7 @@ function runMiddleware(req, res, fn) {
 }
 
 export default {
-  async fetch(request) {
+  async fetch(req) {
     // Run CORS middleware
     await runMiddleware(req, res, corsMiddleware);
 
