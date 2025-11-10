@@ -7,11 +7,11 @@
     "server"
   ],
   "scripts": {
-    "dev": "yarn workspace client dev",
+    "dev": "yarn workspace json-table-viewer dev",
     "dev:server": "yarn workspace server dev",
-    "build": "yarn workspace client build",
+    "build": "yarn workspace json-table-viewer build",
     "build:server": "yarn workspace server build",
-    "build:all": "yarn workspace client build && yarn workspace server build",
-    "preview": "yarn workspace client preview"
+    "build:all": "yarn workspace json-table-viewer build && yarn workspace server build",
+    "preview": "yarn workspace json-table-viewer preview"
   }
 }
