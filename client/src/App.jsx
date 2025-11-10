@@ -107,11 +107,13 @@ function App() {
         setJsonData(parsed);
         setError("");
 
-        // Clear URL query parameter when uploading a file
+        // Clear URL query parameters when uploading a file
         const newUrl = new URL(window.location);
         newUrl.searchParams.delete('url');
+        newUrl.searchParams.delete('path');
         window.history.pushState({}, '', newUrl);
         setUrl(''); // Also clear the URL input
+        setDataPath(''); // Also clear the data path
       } catch (err) {
         setError(`Invalid JSON format: ${err.message}`);
         setJsonData(null);
@@ -191,13 +193,17 @@ function App() {
     }
   };
 
-  // Check for URL query parameter on mount and auto-fetch
+  // Check for URL query parameters on mount and auto-fetch
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlParam = params.get('url');
+    const pathParam = params.get('path');
 
     if (urlParam) {
       setUrl(urlParam);
+    }
+    if (pathParam) {
+      setDataPath(pathParam);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run on mount
@@ -212,6 +218,24 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]); // Run when URL changes
+
+  // Update URL query parameters when dataPath changes
+  useEffect(() => {
+    if (jsonData) {
+      const newUrl = new URL(window.location);
+      const currentUrlParam = newUrl.searchParams.get('url');
+
+      // Only update if we have a URL parameter (meaning data came from URL fetch)
+      if (currentUrlParam) {
+        if (dataPath && dataPath.trim() !== '') {
+          newUrl.searchParams.set('path', dataPath);
+        } else {
+          newUrl.searchParams.delete('path');
+        }
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
+  }, [dataPath, jsonData]);
 
   // Get table data from JSON using useMemo to avoid infinite re-renders
   const tableResult = useMemo(() => {
