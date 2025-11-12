@@ -266,10 +266,13 @@ h2 {
 
 .search-section {
   margin-bottom: 15px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .search-input {
-  width: 100%;
+  flex: 1;
   padding: 10px 15px;
   border: 1px solid #cbd5e0;
   border-radius: 4px;
@@ -281,6 +284,27 @@ h2 {
   outline: none;
   border-color: #4299e1;
   box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.copy-tsv-button {
+  padding: 10px 20px;
+  background-color: #805ad5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+}
+
+.copy-tsv-button:hover {
+  background-color: #6b46c1;
+}
+
+.copy-tsv-button:active {
+  transform: scale(0.98);
 }
 
 .error-message {

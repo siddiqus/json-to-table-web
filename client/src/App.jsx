@@ -306,6 +306,39 @@ function App() {
   const columns =
     tableData && tableData.length > 0 ? Object.keys(tableData[0]) : [];
 
+  // Function to copy table as TSV
+  const copyTableAsTSV = () => {
+    if (!tableData || tableData.length === 0) return;
+
+    // Create TSV header
+    const header = columns.join('\t');
+
+    // Create TSV rows
+    const rows = tableData.map(row =>
+      columns.map(column => {
+        const value = row[column];
+        // Format the value for TSV
+        if (value === null) return 'null';
+        if (value === undefined) return 'undefined';
+        if (typeof value === 'object') return JSON.stringify(value);
+        // Escape tabs and newlines in strings
+        return String(value).replace(/\t/g, ' ').replace(/\n/g, ' ');
+      }).join('\t')
+    );
+
+    // Combine header and rows
+    const tsv = [header, ...rows].join('\n');
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(tsv).then(() => {
+      // Optional: Show a success message
+      alert('Table copied as TSV! You can now paste it into Excel.');
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+      alert('Failed to copy to clipboard. Please try again.');
+    });
+  };
+
   return (
     <div className="app">
       <h1>JSON Table Viewer</h1>
@@ -406,6 +439,13 @@ function App() {
               placeholder="Search table..."
               className="search-input"
             />
+            <button
+              onClick={copyTableAsTSV}
+              className="copy-tsv-button"
+              title="Copy table as TSV for Excel"
+            >
+              Copy as TSV
+            </button>
           </div>
           <div className="data-table-container">
             <table className="data-table">
