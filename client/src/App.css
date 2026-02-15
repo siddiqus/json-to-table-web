@@ -5,7 +5,8 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
   background-color: #f5f5f5;
   color: #333;
   line-height: 1.6;
@@ -43,11 +44,34 @@ h2 {
 }
 
 .upload-section {
-  flex: 0 0 25%;
+  /* flex: 0 0 10%; */
+  flex-shrink: 0;
 }
 
 .url-section {
-  flex: 0 0 calc(75% - 15px);
+  flex: 1;
+}
+
+.text-input-section {
+  flex-shrink: 0;
+}
+
+.text-input-button {
+  padding: 5px 10px;
+  background-color: #ed8936;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+  height: 34px;
+}
+
+.text-input-button:hover {
+  background-color: #dd6b20;
 }
 
 .path-section {
@@ -76,14 +100,14 @@ h2 {
 .path-header-suggestions {
   display: flex;
   flex-direction: row;
-  /* align-items: center; */
   gap: 10px;
   flex: 1;
-  padding: 10px 12px;
+  padding: 5px 12px;
   background-color: #f7fafc;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
   margin: 0 10px;
+  height: 34px;
 }
 
 .path-header-suggestions .suggestions-label {
@@ -113,28 +137,29 @@ h2 {
   font-weight: 500;
   transition: background-color 0.3s ease;
   white-space: nowrap;
-  height: 44px;
+  height: 34px;
 }
 
 .inspect-json-button:hover {
   background-color: #38a169;
 }
 
-.file-input {
-  display: block;
-  padding: 10px;
-  border: 2px dashed #cbd5e0;
+.choose-file-button {
+  padding: 5px 10px;
+  background-color: #4a5568;
+  color: white;
+  border: none;
   border-radius: 4px;
   cursor: pointer;
-  width: 100%;
-  background-color: #f7fafc;
-  transition: all 0.3s ease;
-  height: 44px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+  height: 34px;
 }
 
-.file-input:hover {
-  border-color: #4299e1;
-  background-color: #ebf8ff;
+.choose-file-button:hover {
+  background-color: #2d3748;
 }
 
 .url-input-group {
@@ -149,7 +174,7 @@ h2 {
   border-radius: 4px;
   font-size: 0.95rem;
   transition: border-color 0.3s ease;
-  height: 44px;
+  height: 34px;
 }
 
 .url-input:focus {
@@ -159,15 +184,16 @@ h2 {
 }
 
 .fetch-button {
-  padding: 10px 20px;
+  padding: 5px 10px;
   background-color: #4299e1;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.75rem;
   font-weight: 500;
   transition: background-color 0.3s ease;
+  height: 34px;
 }
 
 .fetch-button:hover:not(:disabled) {
@@ -211,7 +237,7 @@ h2 {
   font-size: 0.95rem;
   margin-bottom: 5px;
   transition: border-color 0.3s ease;
-  height: 44px;
+  height: 34px;
 }
 
 .path-input:focus {
@@ -251,7 +277,7 @@ h2 {
   border-radius: 3px;
   cursor: pointer;
   font-size: 0.75rem;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
   transition: all 0.2s ease;
   line-height: 1.2;
 }
@@ -287,7 +313,7 @@ h2 {
 }
 
 .copy-tsv-button {
-  padding: 10px 20px;
+  padding: 5px 10px;
   background-color: #805ad5;
   color: white;
   border: none;
@@ -297,6 +323,7 @@ h2 {
   font-weight: 500;
   transition: background-color 0.3s ease;
   white-space: nowrap;
+  height: 34px;
 }
 
 .copy-tsv-button:hover {
@@ -374,7 +401,7 @@ h2 {
   margin: 0;
   white-space: pre-wrap;
   word-wrap: break-word;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
   font-size: 0.85rem;
   line-height: 1.5;
 }
@@ -404,12 +431,24 @@ h2 {
   line-height: 1.3;
 }
 
-.markdown-cell h1 { font-size: 1.5em; }
-.markdown-cell h2 { font-size: 1.3em; }
-.markdown-cell h3 { font-size: 1.1em; }
-.markdown-cell h4 { font-size: 1em; }
-.markdown-cell h5 { font-size: 0.9em; }
-.markdown-cell h6 { font-size: 0.85em; }
+.markdown-cell h1 {
+  font-size: 1.5em;
+}
+.markdown-cell h2 {
+  font-size: 1.3em;
+}
+.markdown-cell h3 {
+  font-size: 1.1em;
+}
+.markdown-cell h4 {
+  font-size: 1em;
+}
+.markdown-cell h5 {
+  font-size: 0.9em;
+}
+.markdown-cell h6 {
+  font-size: 0.85em;
+}
 
 .markdown-cell p {
   margin: 0.5em 0;
@@ -419,7 +458,7 @@ h2 {
   background-color: #f6f8fa;
   padding: 3px 7px;
   border-radius: 3px;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
   font-size: 0.85em;
   color: #24292f;
   border: 1px solid #d0d7de;
@@ -535,7 +574,8 @@ h2 {
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .modal-header {
@@ -578,6 +618,140 @@ h2 {
   overflow: auto;
   flex: 1;
   background-color: #272822;
+}
+
+/* JSON Text Input Modal */
+.text-input-modal {
+  max-width: 900px;
+}
+
+.text-input-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.clear-json-button {
+  padding: 6px 14px;
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.clear-json-button:hover:not(:disabled) {
+  background-color: #c53030;
+}
+
+.clear-json-button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.format-json-button {
+  padding: 6px 14px;
+  background-color: #805ad5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.format-json-button:hover:not(:disabled) {
+  background-color: #6b46c1;
+}
+
+.format-json-button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.save-json-button {
+  padding: 6px 14px;
+  background-color: #48bb78;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.save-json-button:hover:not(:disabled) {
+  background-color: #38a169;
+}
+
+.save-json-button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.text-input-body {
+  padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.json-textarea {
+  width: 100%;
+  flex: 1;
+  min-height: 400px;
+  padding: 15px;
+  border: 2px solid #cbd5e0;
+  border-radius: 4px;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  tab-size: 2;
+}
+
+.json-textarea:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.json-textarea-valid {
+  border-color: #48bb78;
+}
+
+.json-textarea-valid:focus {
+  border-color: #48bb78;
+  box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.15);
+}
+
+.json-textarea-error {
+  border-color: #fc8181;
+}
+
+.json-textarea-error:focus {
+  border-color: #fc8181;
+  box-shadow: 0 0 0 3px rgba(252, 129, 129, 0.15);
+}
+
+.json-text-error {
+  color: #c53030;
+  font-size: 0.8rem;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background-color: #fff5f5;
+  border-radius: 4px;
+  border-left: 3px solid #fc8181;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
 }
 
 @media (max-width: 768px) {
@@ -650,6 +824,14 @@ h2 {
 
   .inspect-json-button {
     width: 100%;
+  }
+
+  .text-input-button {
+    width: 100%;
+  }
+
+  .json-textarea {
+    min-height: 300px;
   }
 }
 

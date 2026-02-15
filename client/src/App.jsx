@@ -1,6 +1,6 @@
 import ReactJson from "@microlink/react-json-view";
 import "highlight.js/styles/github.css";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from "rehype-raw";
@@ -37,9 +37,7 @@ function TableCell({ value }) {
     const jsonString = JSON.stringify(value, null, 2);
     return (
       <div className="markdown-cell">
-        <ReactMarkdown
-          rehypePlugins={[rehypeHighlight, rehypeRaw]}
-        >
+        <ReactMarkdown rehypePlugins={[rehypeHighlight, rehypeRaw]}>
           {`\`\`\`json\n${jsonString}\n\`\`\``}
         </ReactMarkdown>
       </div>
@@ -50,20 +48,18 @@ function TableCell({ value }) {
 
   // Check if content looks like markdown or HTML
   const hasMarkdownOrHtml =
-    content.includes('#') || // Headers
-    content.includes('**') || // Bold
-    content.includes('*') || // Italic or lists
-    content.includes('```') || // Code blocks
-    content.includes('<') || // HTML tags
-    content.includes('[') || // Links
-    content.includes('`'); // Inline code
+    content.includes("#") || // Headers
+    content.includes("**") || // Bold
+    content.includes("*") || // Italic or lists
+    content.includes("```") || // Code blocks
+    content.includes("<") || // HTML tags
+    content.includes("[") || // Links
+    content.includes("`"); // Inline code
 
-  if (hasMarkdownOrHtml && typeof value === 'string') {
+  if (hasMarkdownOrHtml && typeof value === "string") {
     return (
       <div className="markdown-cell">
-        <ReactMarkdown
-          rehypePlugins={[rehypeHighlight, rehypeRaw]}
-        >
+        <ReactMarkdown rehypePlugins={[rehypeHighlight, rehypeRaw]}>
           {content}
         </ReactMarkdown>
       </div>
@@ -75,6 +71,7 @@ function TableCell({ value }) {
 }
 
 function App() {
+  const fileInputRef = useRef(null);
   const [jsonData, setJsonData] = useState(null);
   const [error, setError] = useState("");
   const [dataPath, setDataPath] = useState("");
@@ -83,7 +80,65 @@ function App() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [showJsonModal, setShowJsonModal] = useState(false);
+  const [showTextInputModal, setShowTextInputModal] = useState(false);
+  const [jsonTextInput, setJsonTextInput] = useState("");
+  const [jsonTextError, setJsonTextError] = useState("");
   const useCorsProxy = true; // Always use CORS proxy
+
+  // Handle JSON text input changes with live validation
+  const handleJsonTextChange = (text) => {
+    setJsonTextInput(text);
+    if (!text.trim()) {
+      setJsonTextError("");
+      return;
+    }
+    try {
+      JSON.parse(text);
+      setJsonTextError("");
+    } catch (err) {
+      setJsonTextError(err.message);
+    }
+  };
+
+  // Format JSON text in the editor
+  const handleFormatJson = () => {
+    try {
+      const parsed = JSON.parse(jsonTextInput);
+      setJsonTextInput(JSON.stringify(parsed, null, 2));
+      setJsonTextError("");
+    } catch (err) {
+      setJsonTextError(err.message);
+    }
+  };
+
+  // Save JSON from text input
+  const handleSaveJsonText = () => {
+    try {
+      const parsed = JSON.parse(jsonTextInput);
+      setJsonData(parsed);
+      setError("");
+      setShowTextInputModal(false);
+
+      // Clear URL query parameters
+      const newUrl = new URL(window.location);
+      newUrl.searchParams.delete("url");
+      newUrl.searchParams.delete("path");
+      window.history.pushState({}, "", newUrl);
+      setUrl("");
+      setDataPath("");
+    } catch (err) {
+      setJsonTextError(err.message);
+    }
+  };
+
+  // Open text input modal - if jsonData was loaded via this method, pre-populate
+  const handleOpenTextInput = () => {
+    if (jsonData && !url) {
+      setJsonTextInput(JSON.stringify(jsonData, null, 2));
+      setJsonTextError("");
+    }
+    setShowTextInputModal(true);
+  };
 
   // Handle file upload
   const handleFileUpload = (event) => {
@@ -109,11 +164,11 @@ function App() {
 
         // Clear URL query parameters when uploading a file
         const newUrl = new URL(window.location);
-        newUrl.searchParams.delete('url');
-        newUrl.searchParams.delete('path');
-        window.history.pushState({}, '', newUrl);
-        setUrl(''); // Also clear the URL input
-        setDataPath(''); // Also clear the data path
+        newUrl.searchParams.delete("url");
+        newUrl.searchParams.delete("path");
+        window.history.pushState({}, "", newUrl);
+        setUrl(""); // Also clear the URL input
+        setDataPath(""); // Also clear the data path
       } catch (err) {
         setError(`Invalid JSON format: ${err.message}`);
         setJsonData(null);
@@ -147,7 +202,7 @@ function App() {
 
     try {
       // Use our own CORS proxy server
-      const proxyUrl = import.meta.env.VITE_PROXY_URL || '/api/proxy';
+      const proxyUrl = import.meta.env.VITE_PROXY_URL || "/api/proxy";
       const fetchUrl = useCorsProxy
         ? `${proxyUrl}?url=${encodeURIComponent(url)}`
         : url;
@@ -172,8 +227,8 @@ function App() {
 
       // Update browser URL with the fetched URL
       const newUrl = new URL(window.location);
-      newUrl.searchParams.set('url', url);
-      window.history.pushState({}, '', newUrl);
+      newUrl.searchParams.set("url", url);
+      window.history.pushState({}, "", newUrl);
     } catch (err) {
       if (err.name === "SyntaxError") {
         setError(`Invalid JSON format: ${err.message}`);
@@ -196,8 +251,8 @@ function App() {
   // Check for URL query parameters on mount and auto-fetch
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const urlParam = params.get('url');
-    const pathParam = params.get('path');
+    const urlParam = params.get("url");
+    const pathParam = params.get("path");
 
     if (urlParam) {
       setUrl(urlParam);
@@ -211,7 +266,7 @@ function App() {
   // Auto-fetch when URL is set from query parameter
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const urlParam = params.get('url');
+    const urlParam = params.get("url");
 
     if (urlParam && url === urlParam && !jsonData && !loading) {
       handleUrlFetch();
@@ -223,16 +278,16 @@ function App() {
   useEffect(() => {
     if (jsonData) {
       const newUrl = new URL(window.location);
-      const currentUrlParam = newUrl.searchParams.get('url');
+      const currentUrlParam = newUrl.searchParams.get("url");
 
       // Only update if we have a URL parameter (meaning data came from URL fetch)
       if (currentUrlParam) {
-        if (dataPath && dataPath.trim() !== '') {
-          newUrl.searchParams.set('path', dataPath);
+        if (dataPath && dataPath.trim() !== "") {
+          newUrl.searchParams.set("path", dataPath);
         } else {
-          newUrl.searchParams.delete('path');
+          newUrl.searchParams.delete("path");
         }
-        window.history.replaceState({}, '', newUrl);
+        window.history.replaceState({}, "", newUrl);
       }
     }
   }, [dataPath, jsonData]);
@@ -311,47 +366,72 @@ function App() {
     if (!tableData || tableData.length === 0) return;
 
     // Create TSV header
-    const header = columns.join('\t');
+    const header = columns.join("\t");
 
     // Create TSV rows
-    const rows = tableData.map(row =>
-      columns.map(column => {
-        const value = row[column];
-        // Format the value for TSV
-        if (value === null) return 'null';
-        if (value === undefined) return 'undefined';
-        if (typeof value === 'object') return JSON.stringify(value);
-        // Escape tabs and newlines in strings
-        return String(value).replace(/\t/g, ' ').replace(/\n/g, ' ');
-      }).join('\t')
+    const rows = tableData.map((row) =>
+      columns
+        .map((column) => {
+          const value = row[column];
+          // Format the value for TSV
+          if (value === null) return "null";
+          if (value === undefined) return "undefined";
+          if (typeof value === "object") return JSON.stringify(value);
+          // Escape tabs and newlines in strings
+          return String(value).replace(/\t/g, " ").replace(/\n/g, " ");
+        })
+        .join("\t")
     );
 
     // Combine header and rows
-    const tsv = [header, ...rows].join('\n');
+    const tsv = [header, ...rows].join("\n");
 
     // Copy to clipboard
-    navigator.clipboard.writeText(tsv).then(() => {
-      // Optional: Show a success message
-      alert('Table copied as TSV! You can now paste it into Excel.');
-    }).catch(err => {
-      console.error('Failed to copy:', err);
-      alert('Failed to copy to clipboard. Please try again.');
-    });
+    navigator.clipboard
+      .writeText(tsv)
+      .then(() => {
+        // Optional: Show a success message
+        alert("Table copied as TSV! You can now paste it into Excel.");
+      })
+      .catch((err) => {
+        console.error("Failed to copy:", err);
+        alert("Failed to copy to clipboard. Please try again.");
+      });
   };
 
   return (
     <div className="app">
-      <h1>JSON Table Viewer</h1>
+      <div
+        style={{
+          fontWeight: "bold",
+          fontSize: "1.5em",
+          marginBottom: "20px",
+        }}
+      >
+        JSON Table Viewer
+      </div>
 
       <div className="input-section">
         <div className="main-input-row">
+          <div className="text-input-section">
+            <button onClick={handleOpenTextInput} className="text-input-button">
+              {jsonData && !url ? "View / Edit JSON" : "Paste JSON"}
+            </button>
+          </div>
           <div className="upload-section">
             <input
               type="file"
               accept=".json"
               onChange={handleFileUpload}
-              className="file-input"
+              ref={fileInputRef}
+              hidden
             />
+            <button
+              onClick={() => fileInputRef.current.click()}
+              className="choose-file-button"
+            >
+              Choose File
+            </button>
           </div>
 
           <div className="url-section">
@@ -362,14 +442,14 @@ function App() {
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://example.com/data.json"
                 className="url-input"
-                onKeyPress={(e) => e.key === "Enter" && handleUrlFetch()}
+                onKeyDown={(e) => e.key === "Enter" && handleUrlFetch()}
               />
               <button
                 onClick={handleUrlFetch}
                 disabled={loading}
                 className="fetch-button"
               >
-                {loading ? "Fetching..." : "Fetch JSON"}
+                {loading ? "Fetching..." : "Fetch JSON from URL"}
               </button>
             </div>
           </div>
@@ -380,7 +460,8 @@ function App() {
         <div className="input-section">
           <div className="path-section">
             <label className="path-label">
-              Data Path (Optional) - Use dot notation to access the array object property
+              Data Path (Optional) - Use dot notation to access the array object
+              property
             </label>
             <div className="path-header">
               <input
@@ -483,6 +564,72 @@ function App() {
 
           <div className="table-info">
             Showing {tableData.length} row{tableData.length !== 1 ? "s" : ""}
+          </div>
+        </div>
+      )}
+
+      {showTextInputModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowTextInputModal(false)}
+        >
+          <div
+            className="modal-content text-input-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h2>Paste JSON</h2>
+              <div className="text-input-actions">
+                <button
+                  onClick={() => {
+                    setJsonTextInput("");
+                    setJsonTextError("");
+                  }}
+                  className="clear-json-button"
+                  disabled={!jsonTextInput}
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={handleFormatJson}
+                  className="format-json-button"
+                  disabled={!jsonTextInput.trim() || !!jsonTextError}
+                >
+                  Format
+                </button>
+                <button
+                  onClick={handleSaveJsonText}
+                  className="save-json-button"
+                  disabled={!jsonTextInput.trim() || !!jsonTextError}
+                >
+                  Load JSON
+                </button>
+                <button
+                  onClick={() => setShowTextInputModal(false)}
+                  className="modal-close-button"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            <div className="text-input-body">
+              <textarea
+                value={jsonTextInput}
+                onChange={(e) => handleJsonTextChange(e.target.value)}
+                placeholder='Paste or type JSON here, e.g. [{"name": "Alice"}, {"name": "Bob"}]'
+                className={`json-textarea ${
+                  jsonTextError
+                    ? "json-textarea-error"
+                    : jsonTextInput.trim()
+                    ? "json-textarea-valid"
+                    : ""
+                }`}
+                spellCheck={false}
+              />
+              {jsonTextError && (
+                <div className="json-text-error">{jsonTextError}</div>
+              )}
+            </div>
           </div>
         </div>
       )}
