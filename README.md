@@ -6,12 +6,16 @@ A lightweight React single page application for viewing JSON data as searchable 
 
 1. **Upload JSON File** - Upload and validate JSON files with proper error handling
 2. **Fetch from URL** - Fetch JSON data from public HTTP/HTTPS URLs with automatic CORS proxy
-3. **Nested Data Access** - Use dot notation (e.g., `data.user.tasks`) to access nested arrays with clickable property suggestions
-4. **Interactive JSON Inspector** - View and explore full JSON structure with expand/collapse functionality
-5. **Markdown & HTML Rendering** - Table cells automatically detect and render Markdown and HTML content with syntax highlighting
-6. **Searchable Table** - Filter table rows using the search input
-7. **Sortable Columns** - Click column headers to sort ascending/descending
-8. **Whitespace Preservation** - Newlines and whitespace are preserved in table cells
+3. **Paste JSON Text** - Paste or type JSON directly into a text modal with live validation
+4. **Nested Data Access** - Use dot notation (e.g., `data.user.tasks`) to access nested arrays with clickable property suggestions
+5. **Interactive JSON Inspector** - View and explore full JSON structure with expand/collapse functionality
+6. **Markdown & HTML Rendering** - Table cells automatically detect and render Markdown and HTML content with syntax highlighting
+7. **Inline Cell Editing** - Double-click any table cell to edit its value in place
+8. **Copy as TSV** - Copy the entire table as tab-separated values for pasting into Excel or Google Sheets
+9. **Searchable Table** - Filter table rows using the search input
+10. **Sortable Columns** - Click column headers to sort ascending/descending
+11. **Shareable URLs** - URL query parameters persist state (`?url=...&path=...`) for easy sharing
+12. **Whitespace Preservation** - Newlines and whitespace are preserved in table cells
 
 ## Project Structure
 
@@ -72,14 +76,16 @@ This builds both the client and server for production.
 
 ## Usage
 
-1. **Upload a JSON file** using the file input (25% width on the left), or
-2. **Fetch from a URL** by entering an HTTP/HTTPS URL in the input bar (75% width on the right) and clicking "Fetch JSON"
-   - Uses our own CORS proxy server automatically
-3. If your JSON has nested data, use the **Data Path** field (e.g., `data.items`)
+1. **Upload a JSON file** using the file input, or
+2. **Fetch from a URL** by entering an HTTP/HTTPS URL and clicking "Fetch JSON" (uses CORS proxy automatically), or
+3. **Paste JSON text** by clicking "Paste JSON" to open the text input modal
+4. If your JSON has nested data, use the **Data Path** field (e.g., `data.items`)
    - Click on suggested property buttons to quickly set the path
    - Use the **"Inspect JSON"** button to view the full JSON structure in an interactive viewer
-4. Use the **search box** above the table to filter rows
-5. Click **column headers** to sort the table
+5. Use the **search box** above the table to filter rows
+6. Click **column headers** to sort the table
+7. **Double-click** any cell to edit its value inline (Enter to save, Escape to cancel)
+8. Click **"Copy as TSV"** to copy the table for pasting into spreadsheets
 
 ## JSON Inspector
 

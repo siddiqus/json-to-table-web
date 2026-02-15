@@ -290,8 +290,14 @@ function App() {
 
   const tableData = tableResult.data;
   const tableError = tableResult.error;
-  const columns =
-    tableData && tableData.length > 0 ? Object.keys(tableData[0]) : [];
+  const columns = useMemo(() => {
+    if (!jsonData) return [];
+    try {
+      const data = dataPath ? resolvePath(jsonData, dataPath) : jsonData;
+      if (Array.isArray(data) && data.length > 0) return Object.keys(data[0]);
+    } catch {}
+    return [];
+  }, [jsonData, dataPath]);
 
   // Handle inline cell edits — mutate the row object in-place and
   // trigger a re-render by creating a new jsonData reference.
@@ -465,7 +471,7 @@ function App() {
 
       <ErrorMessage message={error || tableError} />
 
-      {tableData && tableData.length > 0 && (
+      {tableData && columns.length > 0 && (
         <Card>
           <DataTable
             data={tableData}
