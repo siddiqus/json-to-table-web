@@ -293,6 +293,24 @@ function App() {
   const columns =
     tableData && tableData.length > 0 ? Object.keys(tableData[0]) : [];
 
+  // Handle inline cell edits — mutate the row object in-place and
+  // trigger a re-render by creating a new jsonData reference.
+  const handleCellEdit = (row, column, newValue) => {
+    let parsed = newValue;
+    if (newValue === "null") parsed = null;
+    else if (newValue === "undefined") parsed = undefined;
+    else if (newValue === "true") parsed = true;
+    else if (newValue === "false") parsed = false;
+    else if (newValue !== "" && !isNaN(Number(newValue))) parsed = Number(newValue);
+
+    row[column] = parsed;
+
+    // Force re-render so TSV copy and display reflect the change
+    setJsonData((prev) =>
+      Array.isArray(prev) ? [...prev] : { ...prev }
+    );
+  };
+
   const copyTableAsTSV = () => {
     if (!tableData || tableData.length === 0) return;
 
@@ -386,6 +404,14 @@ function App() {
         </div>
       </div>
 
+      {!jsonData && !error && (
+        <Card className="welcome-card">
+          <p className="welcome-message">
+            Please input some JSON to see it as a table here! Select an input type from the dropdown above to get started.
+          </p>
+        </Card>
+      )}
+
       {jsonData && (
         <Card>
           <div className="path-section">
@@ -449,6 +475,7 @@ function App() {
             sortConfig={sortConfig}
             onSort={handleSort}
             onCopyTSV={copyTableAsTSV}
+            onCellEdit={handleCellEdit}
           />
         </Card>
       )}

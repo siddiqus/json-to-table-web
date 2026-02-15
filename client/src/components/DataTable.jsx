@@ -11,6 +11,7 @@ function DataTable({
   sortConfig,
   onSort,
   onCopyTSV,
+  onCellEdit,
 }) {
   return (
     <>
@@ -55,7 +56,10 @@ function DataTable({
               <tr key={rowIndex}>
                 {columns.map((column) => (
                   <td key={column}>
-                    <TableCell value={row[column]} />
+                    <TableCell
+                      value={row[column]}
+                      onEdit={(newValue) => onCellEdit(row, column, newValue)}
+                    />
                   </td>
                 ))}
               </tr>

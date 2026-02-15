@@ -61,6 +61,7 @@
   padding: 10px 15px;
   border-bottom: 1px solid #e2e8f0;
   vertical-align: top;
+  position: relative;
 }
 
 .data-table td pre {
@@ -85,6 +86,43 @@
   color: #718096;
   font-size: 0.9rem;
   text-align: right;
+}
+
+.editable-cell {
+  cursor: default;
+  border-radius: 3px;
+  transition: background-color 0.15s ease;
+}
+
+.editable-cell:hover {
+  background-color: #edf2f7;
+}
+
+.cell-edit-wrapper {
+  position: relative;
+}
+
+.cell-edit-wrapper .cell-edit-placeholder {
+  visibility: hidden;
+}
+
+.cell-edit-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  border: 2px solid #4299e1;
+  border-radius: 3px;
+  outline: none;
+  background: #fff;
+  box-sizing: border-box;
+  resize: none;
 }
 
 @media (max-width: 768px) {
