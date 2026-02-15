@@ -1,0 +1,18 @@
+.error-message {
+  background-color: #fff5f5;
+  color: #c53030;
+  padding: 15px;
+  border-radius: 4px;
+  border-left: 4px solid #fc8181;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+}
+
+.error-message--mono {
+  font-size: 0.8rem;
+  margin-top: 8px;
+  margin-bottom: 0;
+  padding: 8px 12px;
+  border-left-width: 3px;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+}

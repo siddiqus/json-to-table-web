@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This guide covers deploying the JSON Table Viewer to Vercel.
+This guide covers deploying the JSON to Table project to Vercel.
 
 ## Project Structure
 

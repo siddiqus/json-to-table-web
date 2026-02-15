@@ -1,74 +1,15 @@
 import ReactJson from "@microlink/react-json-view";
 import "highlight.js/styles/github.css";
 import { useEffect, useMemo, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import rehypeHighlight from "rehype-highlight";
-import rehypeRaw from "rehype-raw";
+import "./App.css";
 
-// Helper function to resolve nested path like 'data.user.tasks'
-function resolvePath(obj, path) {
-  if (!path || path.trim() === "") return obj;
-
-  const keys = path.split(".");
-  let current = obj;
-
-  for (const key of keys) {
-    if (current === null || current === undefined) {
-      throw new Error(`Path "${path}" not found in JSON data`);
-    }
-    current = current[key];
-  }
-
-  return current;
-}
-
-// Helper function to format cell content with whitespace preservation
-function formatCellContent(value) {
-  if (value === null) return "null";
-  if (value === undefined) return "undefined";
-  if (typeof value === "object") return JSON.stringify(value, null, 2);
-  return String(value);
-}
-
-// Component to render table cell with markdown support
-function TableCell({ value }) {
-  // Check if value is a JSON object/array
-  if (typeof value === "object" && value !== null) {
-    const jsonString = JSON.stringify(value, null, 2);
-    return (
-      <div className="markdown-cell">
-        <ReactMarkdown rehypePlugins={[rehypeHighlight, rehypeRaw]}>
-          {`\`\`\`json\n${jsonString}\n\`\`\``}
-        </ReactMarkdown>
-      </div>
-    );
-  }
-
-  const content = formatCellContent(value);
-
-  // Check if content looks like markdown or HTML
-  const hasMarkdownOrHtml =
-    content.includes("#") || // Headers
-    content.includes("**") || // Bold
-    content.includes("*") || // Italic or lists
-    content.includes("```") || // Code blocks
-    content.includes("<") || // HTML tags
-    content.includes("[") || // Links
-    content.includes("`"); // Inline code
-
-  if (hasMarkdownOrHtml && typeof value === "string") {
-    return (
-      <div className="markdown-cell">
-        <ReactMarkdown rehypePlugins={[rehypeHighlight, rehypeRaw]}>
-          {content}
-        </ReactMarkdown>
-      </div>
-    );
-  }
-
-  // Default rendering for non-markdown content
-  return <pre>{content}</pre>;
-}
+import Button from "./components/Button";
+import Card from "./components/Card";
+import DataTable from "./components/DataTable";
+import ErrorMessage from "./components/ErrorMessage";
+import Input from "./components/Input";
+import Modal from "./components/Modal";
+import { resolvePath } from "./utils/json";
 
 function App() {
   const fileInputRef = useRef(null);
@@ -83,7 +24,9 @@ function App() {
   const [showTextInputModal, setShowTextInputModal] = useState(false);
   const [jsonTextInput, setJsonTextInput] = useState("");
   const [jsonTextError, setJsonTextError] = useState("");
-  const useCorsProxy = true; // Always use CORS proxy
+  const [inputType, setInputType] = useState("json-text");
+  const [fileName, setFileName] = useState("");
+  const useCorsProxy = true;
 
   // Handle JSON text input changes with live validation
   const handleJsonTextChange = (text) => {
@@ -119,7 +62,6 @@ function App() {
       setError("");
       setShowTextInputModal(false);
 
-      // Clear URL query parameters
       const newUrl = new URL(window.location);
       newUrl.searchParams.delete("url");
       newUrl.searchParams.delete("path");
@@ -131,7 +73,7 @@ function App() {
     }
   };
 
-  // Open text input modal - if jsonData was loaded via this method, pre-populate
+  // Open text input modal
   const handleOpenTextInput = () => {
     if (jsonData && !url) {
       setJsonTextInput(JSON.stringify(jsonData, null, 2));
@@ -147,7 +89,6 @@ function App() {
 
     if (!file) return;
 
-    // Validate file type
     if (!file.name.endsWith(".json")) {
       setError("Invalid file type. Please upload a JSON file (.json)");
       return;
@@ -161,14 +102,14 @@ function App() {
         const parsed = JSON.parse(content);
         setJsonData(parsed);
         setError("");
+        setFileName(file.name);
 
-        // Clear URL query parameters when uploading a file
         const newUrl = new URL(window.location);
         newUrl.searchParams.delete("url");
         newUrl.searchParams.delete("path");
         window.history.pushState({}, "", newUrl);
-        setUrl(""); // Also clear the URL input
-        setDataPath(""); // Also clear the data path
+        setUrl("");
+        setDataPath("");
       } catch (err) {
         setError(`Invalid JSON format: ${err.message}`);
         setJsonData(null);
@@ -187,7 +128,6 @@ function App() {
     setError("");
     setLoading(true);
 
-    // Validate URL format
     if (!url.trim()) {
       setError("Please enter a URL");
       setLoading(false);
@@ -201,7 +141,6 @@ function App() {
     }
 
     try {
-      // Use our own CORS proxy server
       const proxyUrl = import.meta.env.VITE_PROXY_URL || "/api/proxy";
       const fetchUrl = useCorsProxy
         ? `${proxyUrl}?url=${encodeURIComponent(url)}`
@@ -215,7 +154,6 @@ function App() {
 
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
-        // Still try to parse as JSON even if content-type is not set correctly
         console.warn(
           "Content-Type is not application/json, attempting to parse anyway"
         );
@@ -225,7 +163,6 @@ function App() {
       setJsonData(data);
       setError("");
 
-      // Update browser URL with the fetched URL
       const newUrl = new URL(window.location);
       newUrl.searchParams.set("url", url);
       window.history.pushState({}, "", newUrl);
@@ -248,7 +185,7 @@ function App() {
     }
   };
 
-  // Check for URL query parameters on mount and auto-fetch
+  // Check for URL query parameters on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlParam = params.get("url");
@@ -256,12 +193,11 @@ function App() {
 
     if (urlParam) {
       setUrl(urlParam);
+      setInputType("fetch-url");
     }
-    if (pathParam) {
-      setDataPath(pathParam);
-    }
+    if (pathParam) setDataPath(pathParam);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run on mount
+  }, []);
 
   // Auto-fetch when URL is set from query parameter
   useEffect(() => {
@@ -272,7 +208,7 @@ function App() {
       handleUrlFetch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url]); // Run when URL changes
+  }, [url]);
 
   // Update URL query parameters when dataPath changes
   useEffect(() => {
@@ -280,7 +216,6 @@ function App() {
       const newUrl = new URL(window.location);
       const currentUrlParam = newUrl.searchParams.get("url");
 
-      // Only update if we have a URL parameter (meaning data came from URL fetch)
       if (currentUrlParam) {
         if (dataPath && dataPath.trim() !== "") {
           newUrl.searchParams.set("path", dataPath);
@@ -292,7 +227,7 @@ function App() {
     }
   }, [dataPath, jsonData]);
 
-  // Get table data from JSON using useMemo to avoid infinite re-renders
+  // Get table data from JSON
   const tableResult = useMemo(() => {
     if (!jsonData) return { data: null, error: null };
 
@@ -310,7 +245,6 @@ function App() {
         return { data: null, error: "Array is empty" };
       }
 
-      // Filter based on search term
       let filtered = data;
       if (searchTerm) {
         filtered = data.filter((row) =>
@@ -320,7 +254,6 @@ function App() {
         );
       }
 
-      // Sort data
       if (sortConfig.key) {
         filtered = [...filtered].sort((a, b) => {
           const aVal = a[sortConfig.key];
@@ -347,7 +280,6 @@ function App() {
     }
   }, [jsonData, dataPath, searchTerm, sortConfig]);
 
-  // Handle column sort
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -361,36 +293,27 @@ function App() {
   const columns =
     tableData && tableData.length > 0 ? Object.keys(tableData[0]) : [];
 
-  // Function to copy table as TSV
   const copyTableAsTSV = () => {
     if (!tableData || tableData.length === 0) return;
 
-    // Create TSV header
     const header = columns.join("\t");
-
-    // Create TSV rows
     const rows = tableData.map((row) =>
       columns
         .map((column) => {
           const value = row[column];
-          // Format the value for TSV
           if (value === null) return "null";
           if (value === undefined) return "undefined";
           if (typeof value === "object") return JSON.stringify(value);
-          // Escape tabs and newlines in strings
           return String(value).replace(/\t/g, " ").replace(/\n/g, " ");
         })
         .join("\t")
     );
 
-    // Combine header and rows
     const tsv = [header, ...rows].join("\n");
 
-    // Copy to clipboard
     navigator.clipboard
       .writeText(tsv)
       .then(() => {
-        // Optional: Show a success message
         alert("Table copied as TSV! You can now paste it into Excel.");
       })
       .catch((err) => {
@@ -401,42 +324,49 @@ function App() {
 
   return (
     <div className="app">
-      <div
-        style={{
-          fontWeight: "bold",
-          fontSize: "1.5em",
-          marginBottom: "20px",
-        }}
-      >
-        JSON Table Viewer
-      </div>
+      <div className="app-header">
+        <div className="app-title">JSON to Table</div>
+        <div className="header-controls">
+          <select
+            className="input-type-select"
+            value={inputType}
+            onChange={(e) => setInputType(e.target.value)}
+          >
+            <option value="json-text">JSON Text</option>
+            <option value="file-upload">File Upload</option>
+            <option value="fetch-url">Fetch from URL</option>
+          </select>
 
-      <div className="input-section">
-        <div className="main-input-row">
-          <div className="text-input-section">
-            <button onClick={handleOpenTextInput} className="text-input-button">
+          {inputType === "json-text" && (
+            <Button variant="primary" onClick={handleOpenTextInput}>
               {jsonData && !url ? "View / Edit JSON" : "Paste JSON"}
-            </button>
-          </div>
-          <div className="upload-section">
-            <input
-              type="file"
-              accept=".json"
-              onChange={handleFileUpload}
-              ref={fileInputRef}
-              hidden
-            />
-            <button
-              onClick={() => fileInputRef.current.click()}
-              className="choose-file-button"
-            >
-              Choose File
-            </button>
-          </div>
+            </Button>
+          )}
 
-          <div className="url-section">
-            <div className="url-input-group">
+          {inputType === "file-upload" && (
+            <div className="file-upload-controls">
               <input
+                type="file"
+                accept=".json"
+                onChange={handleFileUpload}
+                ref={fileInputRef}
+                hidden
+              />
+              <Button
+                variant="primary"
+                onClick={() => fileInputRef.current.click()}
+              >
+                Choose File
+              </Button>
+              {fileName && (
+                <span className="file-name">{fileName}</span>
+              )}
+            </div>
+          )}
+
+          {inputType === "fetch-url" && (
+            <div className="url-input-group">
+              <Input
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
@@ -444,27 +374,27 @@ function App() {
                 className="url-input"
                 onKeyDown={(e) => e.key === "Enter" && handleUrlFetch()}
               />
-              <button
+              <Button
+                variant="primary"
                 onClick={handleUrlFetch}
                 disabled={loading}
-                className="fetch-button"
               >
-                {loading ? "Fetching..." : "Fetch JSON from URL"}
-              </button>
+                {loading ? "Fetching..." : "Fetch"}
+              </Button>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       {jsonData && (
-        <div className="input-section">
+        <Card>
           <div className="path-section">
             <label className="path-label">
               Data Path (Optional) - Use dot notation to access the array object
               property
             </label>
             <div className="path-header">
-              <input
+              <Input
                 type="text"
                 value={dataPath}
                 onChange={(e) => {
@@ -495,174 +425,110 @@ function App() {
                     </div>
                   </div>
                 )}
-              <button
+              <Button
+                variant="success"
+                size="md"
                 onClick={() => setShowJsonModal(true)}
-                className="inspect-json-button"
               >
                 Inspect JSON
-              </button>
+              </Button>
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
-      {(error || tableError) && (
-        <div className="error-message">{error || tableError}</div>
-      )}
+      <ErrorMessage message={error || tableError} />
 
       {tableData && tableData.length > 0 && (
-        <div className="json-table-data-container">
-          <div className="search-section">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search table..."
-              className="search-input"
-            />
-            <button
-              onClick={copyTableAsTSV}
-              className="copy-tsv-button"
-              title="Copy table as TSV for Excel"
-            >
-              Copy as TSV
-            </button>
-          </div>
-          <div className="data-table-container">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  {columns.map((column) => (
-                    <th
-                      key={column}
-                      onClick={() => handleSort(column)}
-                      className={sortConfig.key === column ? "sorted" : ""}
-                    >
-                      {column}
-                      {sortConfig.key === column && (
-                        <span className="sort-indicator">
-                          {sortConfig.direction === "asc" ? " ▲" : " ▼"}
-                        </span>
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {tableData.map((row, rowIndex) => (
-                  <tr key={rowIndex}>
-                    {columns.map((column) => (
-                      <td key={column}>
-                        <TableCell value={row[column]} />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="table-info">
-            Showing {tableData.length} row{tableData.length !== 1 ? "s" : ""}
-          </div>
-        </div>
+        <Card>
+          <DataTable
+            data={tableData}
+            columns={columns}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            sortConfig={sortConfig}
+            onSort={handleSort}
+            onCopyTSV={copyTableAsTSV}
+          />
+        </Card>
       )}
 
       {showTextInputModal && (
-        <div
-          className="modal-overlay"
-          onClick={() => setShowTextInputModal(false)}
+        <Modal
+          title="Paste JSON"
+          onClose={() => setShowTextInputModal(false)}
+          className="text-input-modal"
+          actions={
+            <>
+              <Button
+                variant="danger"
+                size="md"
+                onClick={() => {
+                  setJsonTextInput("");
+                  setJsonTextError("");
+                }}
+                disabled={!jsonTextInput}
+              >
+                Clear
+              </Button>
+              <Button
+                variant="purple"
+                size="md"
+                onClick={handleFormatJson}
+                disabled={!jsonTextInput.trim() || !!jsonTextError}
+              >
+                Format
+              </Button>
+              <Button
+                variant="success"
+                size="md"
+                onClick={handleSaveJsonText}
+                disabled={!jsonTextInput.trim() || !!jsonTextError}
+              >
+                Load JSON
+              </Button>
+            </>
+          }
         >
-          <div
-            className="modal-content text-input-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-header">
-              <h2>Paste JSON</h2>
-              <div className="text-input-actions">
-                <button
-                  onClick={() => {
-                    setJsonTextInput("");
-                    setJsonTextError("");
-                  }}
-                  className="clear-json-button"
-                  disabled={!jsonTextInput}
-                >
-                  Clear
-                </button>
-                <button
-                  onClick={handleFormatJson}
-                  className="format-json-button"
-                  disabled={!jsonTextInput.trim() || !!jsonTextError}
-                >
-                  Format
-                </button>
-                <button
-                  onClick={handleSaveJsonText}
-                  className="save-json-button"
-                  disabled={!jsonTextInput.trim() || !!jsonTextError}
-                >
-                  Load JSON
-                </button>
-                <button
-                  onClick={() => setShowTextInputModal(false)}
-                  className="modal-close-button"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-            <div className="text-input-body">
-              <textarea
-                value={jsonTextInput}
-                onChange={(e) => handleJsonTextChange(e.target.value)}
-                placeholder='Paste or type JSON here, e.g. [{"name": "Alice"}, {"name": "Bob"}]'
-                className={`json-textarea ${
-                  jsonTextError
-                    ? "json-textarea-error"
-                    : jsonTextInput.trim()
-                    ? "json-textarea-valid"
-                    : ""
-                }`}
-                spellCheck={false}
-              />
-              {jsonTextError && (
-                <div className="json-text-error">{jsonTextError}</div>
-              )}
-            </div>
+          <div className="text-input-body">
+            <textarea
+              value={jsonTextInput}
+              onChange={(e) => handleJsonTextChange(e.target.value)}
+              placeholder='Paste or type JSON here, e.g. [{"name": "Alice"}, {"name": "Bob"}]'
+              className={`json-textarea ${
+                jsonTextError
+                  ? "json-textarea-error"
+                  : jsonTextInput.trim()
+                  ? "json-textarea-valid"
+                  : ""
+              }`}
+              spellCheck={false}
+            />
+            <ErrorMessage message={jsonTextError} mono />
           </div>
-        </div>
+        </Modal>
       )}
 
       {showJsonModal && jsonData && (
-        <div className="modal-overlay" onClick={() => setShowJsonModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>JSON Structure</h2>
-              <button
-                onClick={() => setShowJsonModal(false)}
-                className="modal-close-button"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="modal-body">
-              <ReactJson
-                src={jsonData}
-                theme="monokai"
-                collapsed={2}
-                displayDataTypes={false}
-                enableClipboard={true}
-                name={false}
-                style={{
-                  padding: "15px",
-                  borderRadius: "4px",
-                  fontSize: "0.9rem",
-                }}
-              />
-            </div>
-          </div>
-        </div>
+        <Modal
+          title="JSON Structure"
+          onClose={() => setShowJsonModal(false)}
+          className="json-inspector-modal"
+        >
+          <ReactJson
+            src={jsonData}
+            theme="monokai"
+            collapsed={2}
+            displayDataTypes={false}
+            enableClipboard={true}
+            name={false}
+            style={{
+              padding: "15px",
+              borderRadius: "4px",
+              fontSize: "0.9rem",
+            }}
+          />
+        </Modal>
       )}
     </div>
   );

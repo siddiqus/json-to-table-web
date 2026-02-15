@@ -1,4 +1,4 @@
-# JSON Table Viewer
+# JSON To Table
 
 A lightweight React single page application for viewing JSON data as searchable and sortable tables with a custom CORS proxy server.
 
