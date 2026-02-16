@@ -10,7 +10,7 @@ function DataTable({
   onSearchChange,
   sortConfig,
   onSort,
-  onCopyTSV,
+  onDownloadTSV,
   onCellEdit,
 }) {
   return (
@@ -25,10 +25,10 @@ function DataTable({
         />
         <Button
           variant="purple"
-          onClick={onCopyTSV}
-          title="Copy table as TSV for Excel"
+          onClick={onDownloadTSV}
+          title="Download table as TSV for Excel"
         >
-          Copy as TSV
+          Download as TSV
         </Button>
       </div>
       <div className="data-table-container">

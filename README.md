@@ -11,7 +11,7 @@ A lightweight React single page application for viewing JSON data as searchable 
 5. **Interactive JSON Inspector** - View and explore full JSON structure with expand/collapse functionality
 6. **Markdown & HTML Rendering** - Table cells automatically detect and render Markdown and HTML content with syntax highlighting
 7. **Inline Cell Editing** - Double-click any table cell to edit its value in place
-8. **Copy as TSV** - Copy the entire table as tab-separated values for pasting into Excel or Google Sheets
+8. **Download as TSV** - Download the entire table as tab-separated values for pasting into Excel or Google Sheets
 9. **Searchable Table** - Filter table rows using the search input
 10. **Sortable Columns** - Click column headers to sort ascending/descending
 11. **Shareable URLs** - URL query parameters persist state (`?url=...&path=...`) for easy sharing

@@ -317,7 +317,7 @@ function App() {
     );
   };
 
-  const copyTableAsTSV = () => {
+  const downloadTableAsTSV = () => {
     if (!tableData || tableData.length === 0) return;
 
     const header = columns.join("\t");
@@ -334,16 +334,15 @@ function App() {
     );
 
     const tsv = [header, ...rows].join("\n");
-
-    navigator.clipboard
-      .writeText(tsv)
-      .then(() => {
-        alert("Table copied as TSV! You can now paste it into Excel.");
-      })
-      .catch((err) => {
-        console.error("Failed to copy:", err);
-        alert("Failed to copy to clipboard. Please try again.");
-      });
+    const blob = new Blob([tsv], { type: "text/tab-separated-values" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "table-data.tsv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -480,7 +479,7 @@ function App() {
             onSearchChange={setSearchTerm}
             sortConfig={sortConfig}
             onSort={handleSort}
-            onCopyTSV={copyTableAsTSV}
+            onDownloadTSV={downloadTableAsTSV}
             onCellEdit={handleCellEdit}
           />
         </Card>
